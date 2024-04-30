@@ -2,3 +2,23 @@
 Kodexempel/.idea/
 
 Kodexempel/obj/
+
+.idea/
+
+.vs/
+
+Kodexempel.Infrastructure/obj/
+
+Kodexempel.Domain/obj/
+
+Kodexempel.Application/obj/
+
+Kodexempel/Kodexempel.Application/obj/
+
+Kodexempel/bin/
+
+Kodexempel.Application/bin/
+
+Kodexempel.Domain/bin/
+
+Kodexempel.Infrastructure/bin/

@@ -1,0 +1,78 @@
+﻿@page "/movierenter"
+@using Kodexempel.Application.Interfaces
+@using Kodexempel.Domain
+@rendermode InteractiveServer
+@inject IMovieRentingService MovieRentingService
+
+<PageTitle>Movie Renter</PageTitle>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Title</th>
+        <th>Genre</th>
+        <th>Release Year</th>
+        <th>Director</th>
+        <th>Rented To</th>
+        <th>Renting</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var movie in _movies ?? [])
+    {
+    <tr>
+        <td>@movie.Title</td>
+        <td>@movie.Genre</td>
+        <td>@movie.ReleaseYear</td>
+        <td>@movie.Director</td>
+        <td>@(movie.RentedBy?.Name ?? "None")</td>
+        @if (movie.RentedBy == null)
+        {
+        <td>
+            <select class="form-control" @bind="_selectedCustomerIds[movie]">
+                <option value="">Select Customer</option>
+                @foreach (var customer in _customers)
+                {
+                <option value="@customer.Id">@customer.Name</option>
+                }
+            </select>
+            <button class="btn btn-primary" @onclick="() => RentMovie(movie, _selectedCustomerIds[movie])">Rent Movie</button>
+        </td>
+        }
+        else
+        {
+            <button class="btn btn-warning" @onclick="() => UnrentMovie(movie)">Unrent</button>
+        }
+    </tr>
+    }
+    </tbody>
+</table>
+
+
+@code {
+
+    readonly Dictionary<Movie, Guid> _selectedCustomerIds = new();
+    List<Movie> _movies;
+    List<Customer> _customers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _movies = await MovieRentingService.GetMovies();
+        _customers = await MovieRentingService.GetCustomers();
+        foreach (var movie in _movies)
+        {
+            _selectedCustomerIds[movie] = Guid.Empty;
+        }
+    }
+
+    private async Task RentMovie(Movie movie, Guid selectedCustomerId)
+    {
+        var selectedCustomer = _customers.First(c => c.Id == selectedCustomerId);
+        await MovieRentingService.RentMovie(selectedCustomer, movie);
+    }
+    
+    private async Task UnrentMovie(Movie movie)
+    {
+        await MovieRentingService.UnrentMovie(movie);
+    }
+}
